@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Chess Club - Criar Conta</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Config -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary": "#ffffff",
+                        "outline": "#737686",
+                        "secondary-fixed": "#e4e2e1",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "surface-variant": "#e2e2e2",
+                        "primary-fixed": "#dbe1ff",
+                        "on-background": "#1b1b1b",
+                        "inverse-on-surface": "#f1f1f1",
+                        "inverse-surface": "#303030",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-tint": "#0053db",
+                        "tertiary-fixed-dim": "#ffb596",
+                        "tertiary-fixed": "#ffdbcd",
+                        "tertiary": "#943700",
+                        "on-error-container": "#93000a",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-tertiary-fixed": "#360f00",
+                        "on-surface-variant": "#434655",
+                        "surface-container-low": "#f3f3f3",
+                        "surface-container-high": "#e8e8e8",
+                        "on-tertiary-container": "#ffede6",
+                        "inverse-primary": "#b4c5ff",
+                        "on-secondary-container": "#656464",
+                        "on-primary-fixed": "#00174b",
+                        "on-primary": "#ffffff",
+                        "surface-container": "#eeeeee",
+                        "secondary": "#5f5e5e",
+                        "primary-container": "#2563eb",
+                        "primary": "#004ac6",
+                        "on-surface": "#1b1b1b",
+                        "error": "#ba1a1a",
+                        "secondary-container": "#e4e2e1",
+                        "on-secondary-fixed": "#1b1c1c",
+                        "secondary-fixed-dim": "#c8c6c6",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#7d2d00",
+                        "on-primary-container": "#eeefff",
+                        "surface-dim": "#dadada",
+                        "tertiary-container": "#bc4800",
+                        "background": "#f9f9f9",
+                        "on-secondary-fixed-variant": "#474747",
+                        "surface-bright": "#f9f9f9",
+                        "surface": "#f9f9f9",
+                        "on-error": "#ffffff",
+                        "outline-variant": "#c3c6d7",
+                        "on-tertiary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "xl": "48px",
+                        "margin-mobile": "20px",
+                        "gutter": "16px",
+                        "xs": "4px",
+                        "md": "16px",
+                        "sm": "8px",
+                        "lg": "24px",
+                        "unit": "4px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-xl": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display-xl": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Hide scrollbar for clean minimal look */
+        body {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        body::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col antialiased">
+<!-- Transactional Screen: Navigation Suppressed -->
+<main class="flex-grow flex flex-col items-center justify-center p-gutter md:p-xl w-full max-w-[480px] mx-auto">
+<!-- Header Section -->
+<div class="flex flex-col items-center mb-xl w-full">
+<div class="mb-sm flex items-center justify-center w-16 h-16 rounded-full bg-on-background text-surface-container-lowest">
+<span class="material-symbols-outlined text-[32px]">
+                    token
+                </span>
+</div>
+<h1 class="font-display-xl text-display-xl text-center tracking-tighter uppercase text-on-background">
+                CHESS CLUB
+            </h1>
+</div>
+<!-- Form Section -->
+<form class="w-full flex flex-col gap-lg" novalidate="">
+<!-- Nome Field -->
+<div class="flex flex-col gap-xs relative">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest" for="nome">
+                    Nome
+                </label>
+<input class="border-0 border-b border-outline bg-transparent px-0 py-sm font-body-lg text-body-lg text-on-background placeholder:text-outline-variant focus:ring-0 focus:border-on-background transition-colors w-full rounded-none" id="nome" name="nome" placeholder="Seu nome completo" type="text"/>
+</div>
+<!-- Username Field (Validation Error State) -->
+<div class="flex flex-col gap-xs relative">
+<label class="font-label-sm text-label-sm text-error uppercase tracking-widest" for="username">
+                    Username
+                </label>
+<input class="border-0 border-b border-error bg-transparent px-0 py-sm font-body-lg text-body-lg text-on-background focus:ring-0 focus:border-error transition-colors w-full rounded-none" id="username" name="username" type="text" value="grandmaster_j"/>
+<p class="font-label-sm text-label-sm text-error mt-xs flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">error</span>
+                    Este usuário ou e-mail já está em uso.
+                </p>
+</div>
+<!-- E-mail Field -->
+<div class="flex flex-col gap-xs relative">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest" for="email">
+                    E-mail
+                </label>
+<input class="border-0 border-b border-outline bg-transparent px-0 py-sm font-body-lg text-body-lg text-on-background placeholder:text-outline-variant focus:ring-0 focus:border-on-background transition-colors w-full rounded-none" id="email" name="email" type="email" value="jm@example.com"/>
+</div>
+<!-- Senha Field -->
+<div class="flex flex-col gap-xs relative">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest" for="senha">
+                    Senha
+                </label>
+<input class="border-0 border-b border-outline bg-transparent px-0 py-sm font-body-lg text-body-lg text-on-background placeholder:text-outline-variant focus:ring-0 focus:border-on-background transition-colors w-full rounded-none" id="senha" name="senha" placeholder="••••••••" type="password"/>
+</div>
+<!-- Actions -->
+<div class="mt-md flex flex-col gap-md">
+<button class="w-full bg-on-background text-surface-container-lowest py-md rounded font-label-sm text-label-sm uppercase tracking-widest hover:bg-inverse-surface transition-colors focus:outline-none focus:ring-2 focus:ring-on-background focus:ring-offset-2 focus:ring-offset-background" type="button">
+                    Criar Conta
+                </button>
+</div>
+</form>
+<!-- Secondary Action -->
+<div class="mt-xl text-center w-full">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-on-background underline decoration-1 underline-offset-4 transition-colors" href="#">
+                Já tem uma conta? Entre
+            </a>
+</div>
+</main>
+</body></html>
