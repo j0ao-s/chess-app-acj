@@ -1,11 +1,13 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Bell, User, Key, Trophy, Crown, LayoutDashboard } from 'lucide-react-native';
+import { Bell, User, Trophy, Crown, LayoutDashboard } from 'lucide-react-native';
 import theme from '../theme';
+import { useAuth } from '../context/AuthContext';
 
 const DashboardScreen: React.FC = () => {
   const router = useRouter();
+  const { user } = useAuth();
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -16,7 +18,7 @@ const DashboardScreen: React.FC = () => {
             source={{ uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDcyuNx4Op8mIygkWZR1hoPdNm5rI1H1ijBAAZFUZysBMt1_N-Q2GwfbGTq2FwW22O-F2WIVG7kmeRrupZqaloSwf1mT8Sz5Ded6m_9VtI8t1d0rBIuGUGJHXwnpF-nq0SLLSAlyA7NFKqU2Zf0QB-yyDsfO_-B5tZDwA-0zyImVWnEQPgkHv2AqQDtOcepSIqEE2ayg76bSUVTtDl9sQt4WCLnLCPM86cqZn1hbukU-MA5qcUf9wcNLDws0IIvpHA-oQzIv6IPz28' }}
             style={styles.profileImage}
           />
-          <Text style={styles.userName}>G. KASPAROV</Text>
+          <Text style={styles.userName}>{user?.name?.toUpperCase() ?? ''}</Text>
         </View>
         <TouchableOpacity style={styles.notificationBtn}>
           <Bell size={24} color={theme.colors.onSurface} strokeWidth={1.5} />
@@ -26,7 +28,7 @@ const DashboardScreen: React.FC = () => {
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Contextual Header */}
         <View style={styles.headerSection}>
-          <Text style={styles.greeting}>Olá, G. Kasparov</Text>
+          <Text style={styles.greeting}>Olá, {user?.name ?? ''}</Text>
           <Text style={styles.subtitle}>O tabuleiro está montado. Qual será o seu próximo movimento no clube hoje?</Text>
         </View>
 

@@ -3,36 +3,62 @@ import { View, Text, TouchableOpacity, TextInput, StyleSheet, SafeAreaView, Scro
 import { useRouter } from 'expo-router';
 import { ArrowLeft, LayoutDashboard, Trophy, User } from 'lucide-react-native';
 import theme from '../theme';
+import { useAuth } from '../context/AuthContext';
+import { api } from '../lib/api';
 
 const SettingsScreen: React.FC = () => {
   const router = useRouter();
+  const { user, logout, updateUser } = useAuth();
 
-  // Alterar Dados State
-  const [name, setName] = useState('Garry Kasparov');
-  const [username, setUsername] = useState('g_kasparov');
-  const [email, setEmail] = useState('garry@chessclub.com');
+  const [name, setName] = useState(user?.name ?? '');
+  const [username, setUsername] = useState(user?.username ?? '');
+  const [email, setEmail] = useState(user?.email ?? '');
+  const [profileMsg, setProfileMsg] = useState<{ text: string; error: boolean } | null>(null);
+  const [profileLoading, setProfileLoading] = useState(false);
 
-  // Alterar Senha State
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordMsg, setPasswordMsg] = useState<{ text: string; error: boolean } | null>(null);
+  const [passwordLoading, setPasswordLoading] = useState(false);
 
   const handleUpdateProfile = async () => {
     try {
-      // TODO: Implement API call here
-      console.log('Updating profile with:', { name, username, email });
-    } catch (err) {
-      console.error('Failed to update profile', err);
+      setProfileMsg(null);
+      setProfileLoading(true);
+      const updated = await api.put(`/users/${user!.id}`, { name, username, email });
+      updateUser(updated);
+      setProfileMsg({ text: 'Dados atualizados com sucesso.', error: false });
+    } catch (err: any) {
+      setProfileMsg({ text: err.message || 'Erro ao salvar.', error: true });
+    } finally {
+      setProfileLoading(false);
     }
   };
 
   const handleUpdatePassword = async () => {
-    try {
-      // TODO: Implement API call here
-      console.log('Updating password');
-    } catch (err) {
-      console.error('Failed to update password', err);
+    if (newPassword !== confirmPassword) {
+      setPasswordMsg({ text: 'As senhas não coincidem.', error: true });
+      return;
     }
+    try {
+      setPasswordMsg(null);
+      setPasswordLoading(true);
+      await api.put(`/users/${user!.id}/password`, { currentPassword, newPassword });
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setPasswordMsg({ text: 'Senha alterada com sucesso.', error: false });
+    } catch (err: any) {
+      setPasswordMsg({ text: err.message || 'Erro ao alterar senha.', error: true });
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    router.replace('/');
   };
 
   return (
@@ -87,12 +113,14 @@ const SettingsScreen: React.FC = () => {
             />
           </View>
 
+          {profileMsg && (
+            <Text style={[styles.feedbackText, profileMsg.error && styles.feedbackError]}>
+              {profileMsg.text}
+            </Text>
+          )}
           <View style={styles.actionsContainer}>
-            <TouchableOpacity style={styles.primaryBtn} onPress={handleUpdateProfile}>
-              <Text style={styles.primaryBtnText}>SALVAR ALTERAÇÕES</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.secondaryBtn}>
-              <Text style={styles.secondaryBtnText}>CANCELAR</Text>
+            <TouchableOpacity style={[styles.primaryBtn, profileLoading && { opacity: 0.6 }]} onPress={handleUpdateProfile} disabled={profileLoading}>
+              <Text style={styles.primaryBtnText}>{profileLoading ? 'SALVANDO...' : 'SALVAR ALTERAÇÕES'}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -138,15 +166,23 @@ const SettingsScreen: React.FC = () => {
             />
           </View>
 
+          {passwordMsg && (
+            <Text style={[styles.feedbackText, passwordMsg.error && styles.feedbackError]}>
+              {passwordMsg.text}
+            </Text>
+          )}
           <View style={styles.actionsContainer}>
-            <TouchableOpacity style={styles.primaryBtn} onPress={handleUpdatePassword}>
-              <Text style={styles.primaryBtnText}>ALTERAR SENHA</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.secondaryBtn}>
-              <Text style={styles.secondaryBtnText}>CANCELAR</Text>
+            <TouchableOpacity style={[styles.primaryBtn, passwordLoading && { opacity: 0.6 }]} onPress={handleUpdatePassword} disabled={passwordLoading}>
+              <Text style={styles.primaryBtnText}>{passwordLoading ? 'ALTERANDO...' : 'ALTERAR SENHA'}</Text>
             </TouchableOpacity>
           </View>
         </View>
+
+        <View style={styles.divider} />
+
+        <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
+          <Text style={styles.logoutBtnText}>SAIR DA CONTA</Text>
+        </TouchableOpacity>
 
       </ScrollView>
 
@@ -331,6 +367,33 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
     marginTop: 4,
     color: '#09090b',
+  },
+  feedbackText: {
+    fontFamily: theme.typography.labelSm.fontFamily,
+    fontSize: theme.typography.labelSm.fontSize,
+    fontWeight: theme.typography.labelSm.fontWeight as any,
+    color: theme.colors.primary,
+    marginBottom: theme.spacing.sm,
+  },
+  feedbackError: {
+    color: theme.colors.error,
+  },
+  logoutBtn: {
+    borderWidth: 1,
+    borderColor: theme.colors.error,
+    paddingVertical: theme.spacing.md,
+    borderRadius: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: theme.spacing.xl,
+  },
+  logoutBtnText: {
+    fontFamily: theme.typography.labelSm.fontFamily,
+    fontSize: theme.typography.labelSm.fontSize,
+    fontWeight: theme.typography.labelSm.fontWeight as any,
+    color: theme.colors.error,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
 });
 

@@ -3,23 +3,37 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Scro
 import { useRouter } from 'expo-router';
 import { UserPlus } from 'lucide-react-native';
 import theme from '../theme';
+import { useAuth } from '../context/AuthContext';
 
 const RegisterScreen = () => {
   const router = useRouter();
+  const { register } = useAuth();
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ username?: string; general?: string }>({});
+  const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
+    if (!name || !username || !email || !password) {
+      setErrors({ general: 'Preencha todos os campos.' });
+      return;
+    }
     try {
       setErrors({});
-      // Simulate API call
-      console.log('Registering with:', { name, username, email, password });
+      setLoading(true);
+      await register(name, username, email, password);
       router.replace('/dashboard');
-    } catch (err) {
-      setErrors({ general: 'Falha ao criar conta. Tente novamente.' });
+    } catch (err: any) {
+      const msg: string = err.message || '';
+      if (msg.toLowerCase().includes('username')) {
+        setErrors({ username: msg });
+      } else {
+        setErrors({ general: msg || 'Falha ao criar conta. Tente novamente.' });
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -93,8 +107,8 @@ const RegisterScreen = () => {
             {errors.general && <Text style={styles.errorSubtext}>{errors.general}</Text>}
 
             {/* Action */}
-            <TouchableOpacity style={styles.button} onPress={handleRegister}>
-              <Text style={styles.buttonText}>CRIAR CONTA</Text>
+            <TouchableOpacity style={[styles.button, loading && { opacity: 0.6 }]} onPress={handleRegister} disabled={loading}>
+              <Text style={styles.buttonText}>{loading ? 'CRIANDO...' : 'CRIAR CONTA'}</Text>
             </TouchableOpacity>
           </View>
 

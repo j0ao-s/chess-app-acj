@@ -3,21 +3,30 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView } fro
 import { useRouter } from 'expo-router';
 import { Crown } from 'lucide-react-native';
 import theme from '../theme';
+import { useAuth } from '../context/AuthContext';
 
 const LoginScreen: React.FC = () => {
   const router = useRouter();
+  const { login } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
+    if (!username || !password) {
+      setError('Preencha usuário e senha.');
+      return;
+    }
     try {
       setError(null);
-      // Simulate API call
-      console.log('Logging in with:', { username, password });
+      setLoading(true);
+      await login(username, password);
       router.replace('/dashboard');
-    } catch (err) {
-      setError('Falha ao fazer login. Tente novamente.');
+    } catch (err: any) {
+      setError(err.message || 'Falha ao fazer login. Tente novamente.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -55,8 +64,8 @@ const LoginScreen: React.FC = () => {
             {error && <Text style={styles.errorText}>{error}</Text>}
           </View>
 
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.buttonText}>Entrar</Text>
+          <TouchableOpacity style={[styles.button, loading && { opacity: 0.6 }]} onPress={handleLogin} disabled={loading}>
+            <Text style={styles.buttonText}>{loading ? 'Entrando...' : 'Entrar'}</Text>
           </TouchableOpacity>
         </View>
 

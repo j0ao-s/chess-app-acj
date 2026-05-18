@@ -1,10 +1,31 @@
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { Stack, useRouter, useSegments } from 'expo-router'
+import { StatusBar } from 'expo-status-bar'
+import 'react-native-reanimated'
+import { useEffect } from 'react'
+import { AuthProvider, useAuth } from '../context/AuthContext'
+
+function RouteGuard() {
+  const { user, loading } = useAuth()
+  const segments = useSegments()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (loading) return
+    const isProtected = ['dashboard', 'ranking', 'settings'].includes(segments[0] as string)
+    if (!user && isProtected) {
+      router.replace('/')
+    } else if (user && !isProtected) {
+      router.replace('/dashboard')
+    }
+  }, [user, loading, segments])
+
+  return null
+}
 
 export default function RootLayout() {
   return (
-    <>
+    <AuthProvider>
+      <RouteGuard />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
         <Stack.Screen name="register" />
@@ -13,6 +34,6 @@ export default function RootLayout() {
         <Stack.Screen name="settings" />
       </Stack>
       <StatusBar style="auto" />
-    </>
-  );
+    </AuthProvider>
+  )
 }
