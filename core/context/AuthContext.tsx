@@ -49,7 +49,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function logout() {
-    await AsyncStorage.multiRemove(['token', 'user'])
+    try {
+      await AsyncStorage.removeItem('token')
+      await AsyncStorage.removeItem('user')
+    } catch (err) {
+      console.error('Logout error:', err)
+    }
     setUser(null)
   }
 
