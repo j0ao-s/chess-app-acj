@@ -75,7 +75,7 @@ async function logout() {
 
 ## ✅ TAREFA 2: README Front-End (core/)
 
-**Status:** 🟡 **NORMAL**  
+**Status:** ✅ **CONCLUÍDO - 2026-05-18 15:10**  
 **Impacto:** Documentação, onboarding de devs
 
 ### 🤖 Sequência de Execução
@@ -117,7 +117,7 @@ Tokens: 0
 
 ## ✅ TAREFA 3: README Back-End (chess-backeend/)
 
-**Status:** 🟡 **NORMAL**  
+**Status:** ✅ **CONCLUÍDO - 2026-05-18 15:50**  
 **Impacto:** Documentação API, deploy
 
 ### 🤖 Sequência de Execução
