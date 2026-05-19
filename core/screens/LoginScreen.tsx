@@ -88,7 +88,8 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surfaceContainerLowest,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 24,
+    paddingHorizontal: 32,
+    paddingVertical: 24,
   },
   main: {
     width: '100%',
@@ -96,6 +97,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     gap: theme.spacing.xl,
+    paddingVertical: theme.spacing.lg,
   },
   header: {
     alignItems: 'center',
@@ -136,8 +138,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.onSurface,
-    paddingHorizontal: 0,
-    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.md,
     fontFamily: theme.typography.bodyLg.fontFamily,
     fontSize: theme.typography.bodyLg.fontSize,
     fontWeight: theme.typography.bodyLg.fontWeight as any,

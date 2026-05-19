@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, LayoutDashboard, Trophy, User } from 'lucide-react-native';
+import { ArrowLeft } from 'lucide-react-native';
 import theme from '../theme';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../lib/api';
+import { BottomNavigationBar } from '../components/BottomNavigationBar';
 
 const SettingsScreen: React.FC = () => {
   const router = useRouter();
@@ -21,6 +22,10 @@ const SettingsScreen: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordMsg, setPasswordMsg] = useState<{ text: string; error: boolean } | null>(null);
   const [passwordLoading, setPasswordLoading] = useState(false);
+
+  const [points, setPoints] = useState('');
+  const [scoreMsg, setScoreMsg] = useState<{ text: string; error: boolean } | null>(null);
+  const [scoreLoading, setScoreLoading] = useState(false);
 
   const handleUpdateProfile = async () => {
     try {
@@ -56,6 +61,27 @@ const SettingsScreen: React.FC = () => {
     }
   };
 
+  const handleUpdateScore = async () => {
+    const pointsNum = parseInt(points, 10);
+    if (isNaN(pointsNum)) {
+      setScoreMsg({ text: 'Por favor, insira um número válido.', error: true });
+      return;
+    }
+
+    try {
+      setScoreMsg(null);
+      setScoreLoading(true);
+      const res = await (api as any).patch(`/users/${user!.id}/score`, { points: pointsNum });
+      updateUser({ ...user, score: res.score } as any);
+      setScoreMsg({ text: `Pontuação atualizada! Novo score: ${res.score}`, error: false });
+      setPoints('');
+    } catch (err: any) {
+      setScoreMsg({ text: err.message || 'Erro ao atualizar pontuação.', error: true });
+    } finally {
+      setScoreLoading(false);
+    }
+  };
+
   const handleLogout = async () => {
     await logout();
     router.replace('/');
@@ -65,7 +91,7 @@ const SettingsScreen: React.FC = () => {
     <SafeAreaView style={styles.safeArea}>
       {/* TopAppBar */}
       <View style={styles.appBar}>
-        <TouchableOpacity style={styles.appBarBtn} onPress={() => router.back()}>
+        <TouchableOpacity style={styles.appBarBtn} onPress={() => router.push('/dashboard')}>
           <ArrowLeft size={24} color={theme.colors.onSurface} strokeWidth={1.5} />
         </TouchableOpacity>
         <Text style={styles.appBarTitle}>CONFIGURAÇÕES</Text>
@@ -180,29 +206,41 @@ const SettingsScreen: React.FC = () => {
 
         <View style={styles.divider} />
 
+        {/* Sessão: Pontuação Manual */}
+        <Text style={styles.sectionTitle}>Pontuação Manual</Text>
+        <View style={styles.formContainer}>
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>PONTOS A ADICIONAR/REMOVER (+/-)</Text>
+            <TextInput 
+              style={styles.input}
+              placeholder="Ex: 10 ou -5"
+              value={points}
+              onChangeText={setPoints}
+              keyboardType="numbers-and-punctuation"
+              placeholderTextColor={theme.colors.surfaceDim}
+            />
+          </View>
+
+          {scoreMsg && (
+            <Text style={[styles.feedbackText, scoreMsg.error && styles.feedbackError]}>
+              {scoreMsg.text}
+            </Text>
+          )}
+          <View style={styles.actionsContainer}>
+            <TouchableOpacity style={[styles.primaryBtn, scoreLoading && { opacity: 0.6 }]} onPress={handleUpdateScore} disabled={scoreLoading}>
+              <Text style={styles.primaryBtnText}>{scoreLoading ? 'ATUALIZANDO...' : 'ATUALIZAR PONTUAÇÃO'}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.divider} />
+
         <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
           <Text style={styles.logoutBtnText}>SAIR DA CONTA</Text>
         </TouchableOpacity>
 
       </ScrollView>
-
-      {/* BottomNavBar */}
-      <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/dashboard')}>
-          <LayoutDashboard size={20} color="#a1a1aa" strokeWidth={1.5} />
-          <Text style={styles.navLabel}>DASHBOARD</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/ranking')}>
-          <Trophy size={20} color="#a1a1aa" strokeWidth={1.5} />
-          <Text style={styles.navLabel}>RANKING</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={[styles.navItem, styles.navItemActive]} onPress={() => router.push('/settings')}>
-          <User size={20} color="#000000" strokeWidth={1.5} />
-          <Text style={styles.navLabelActive}>PERFIL</Text>
-        </TouchableOpacity>
-      </View>
+      <BottomNavigationBar activeRoute="/settings" />
     </SafeAreaView>
   );
 };
@@ -210,34 +248,27 @@ const SettingsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: theme.colors.surfaceContainerLowest, // bg-white
+    backgroundColor: theme.colors.surfaceContainerLowest,
   },
   appBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    height: 64,
-    paddingHorizontal: theme.spacing.lg,
-    backgroundColor: theme.colors.surfaceContainerLowest,
+    height: 56,
+    paddingHorizontal: 24,
     borderBottomWidth: 1,
-    borderBottomColor: theme.colors.onSurface,
-    zIndex: 10,
+    borderBottomColor: '#000000',
   },
   appBarBtn: {
-    padding: theme.spacing.sm,
-    marginLeft: -theme.spacing.sm,
-  },
-  materialIcon: {
-    fontSize: 24,
-    color: theme.colors.onSurface,
+    padding: 4,
   },
   appBarTitle: {
-    fontFamily: theme.typography.headlineMd.fontFamily,
-    fontSize: theme.typography.headlineMd.fontSize,
-    fontWeight: theme.typography.headlineMd.fontWeight as any,
-    color: theme.colors.onSurface,
+    fontFamily: 'Inter',
+    fontSize: 18,
+    fontWeight: '900',
     textTransform: 'uppercase',
     letterSpacing: -0.5,
+    color: '#000000',
   },
   appBarPlaceholder: {
     width: 40, // balancing empty space
@@ -326,48 +357,6 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surfaceVariant,
     marginVertical: theme.spacing.xl,
   },
-  bottomNav: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 80,
-    backgroundColor: '#ffffff',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: '#18181b',
-    paddingHorizontal: 16,
-  },
-  navItem: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100%',
-    paddingTop: 8,
-    borderTopWidth: 2,
-    borderTopColor: 'transparent',
-  },
-  navItemActive: {
-    borderTopColor: '#09090b',
-  },
-  navLabel: {
-    fontFamily: 'Inter',
-    fontSize: 10,
-    textTransform: 'uppercase',
-    letterSpacing: -0.5,
-    marginTop: 4,
-    color: '#a1a1aa',
-  },
-  navLabelActive: {
-    fontFamily: 'Inter',
-    fontSize: 10,
-    textTransform: 'uppercase',
-    letterSpacing: -0.5,
-    marginTop: 4,
-    color: '#09090b',
-  },
   feedbackText: {
     fontFamily: theme.typography.labelSm.fontFamily,
     fontSize: theme.typography.labelSm.fontSize,
@@ -385,7 +374,6 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: theme.spacing.xl,
   },
   logoutBtnText: {
     fontFamily: theme.typography.labelSm.fontFamily,

@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Menu, Search, Crown, LayoutDashboard, Trophy, User } from 'lucide-react-native';
+import { Menu, Plus, Crown } from 'lucide-react-native';
 import theme from '../theme';
 import { api } from '../lib/api';
+import { BottomNavigationBar } from '../components/BottomNavigationBar';
+import Animated, { FadeInDown, BounceInUp, BounceIn } from 'react-native-reanimated';
 
 type Player = { rank: number; name: string; username: string; score: number };
 
@@ -47,9 +49,9 @@ const RankingScreen: React.FC = () => {
         <TouchableOpacity style={styles.appBarBtn}>
           <Menu size={24} color="#000" strokeWidth={1.5} />
         </TouchableOpacity>
-        <Text style={styles.appBarTitle}>RANKINGS</Text>
-        <TouchableOpacity style={styles.appBarBtn}>
-          <Search size={24} color="#000" strokeWidth={1.5} />
+        <Text style={styles.appBarTitle}>CLASSIFICAÇÃO</Text>
+        <TouchableOpacity style={styles.appBarBtn} onPress={() => router.push('/settings')}>
+          <Plus size={24} color="#000" strokeWidth={1.5} />
         </TouchableOpacity>
       </View>
 
@@ -66,48 +68,52 @@ const RankingScreen: React.FC = () => {
             {topPlayers.length >= 3 && (
               <View style={styles.podiumContainer}>
                 {/* 2nd Place */}
-                <View style={[styles.podiumItem, styles.podiumItemSide]}>
+                <Animated.View entering={BounceInUp.delay(200).springify()} style={[styles.podiumItem, styles.podiumItemSide]}>
                   <Avatar name={topPlayers[1].name} size={80} />
                   <View style={styles.podiumBadge}>
                     <Text style={styles.podiumBadgeText}>2</Text>
                   </View>
                   <Text style={styles.podiumName}>{topPlayers[1].name}</Text>
                   <Text style={styles.podiumScore}>{topPlayers[1].score}</Text>
-                </View>
+                </Animated.View>
 
                 {/* 1st Place */}
-                <View style={[styles.podiumItem, styles.podiumItemCenter]}>
-                  <Crown size={24} color={theme.colors.onSurface} strokeWidth={1.5} style={{ marginBottom: theme.spacing.xs }} />
+                <Animated.View entering={BounceInUp.delay(0).springify()} style={[styles.podiumItem, styles.podiumItemCenter]}>
+                  <Animated.View entering={BounceIn.delay(600).springify()}>
+                    <Crown size={24} color={theme.colors.onSurface} strokeWidth={1.5} style={{ marginBottom: theme.spacing.xs }} />
+                  </Animated.View>
                   <Avatar name={topPlayers[0].name} size={112} />
                   <View style={[styles.podiumBadge, styles.podiumBadgeFirst]}>
                     <Text style={styles.podiumBadgeTextFirst}>1</Text>
                   </View>
                   <Text style={[styles.podiumName, styles.podiumNameFirst]}>{topPlayers[0].name}</Text>
                   <Text style={styles.podiumScore}>{topPlayers[0].score}</Text>
-                </View>
+                </Animated.View>
 
                 {/* 3rd Place */}
-                <View style={[styles.podiumItem, styles.podiumItemSide]}>
+                <Animated.View entering={BounceInUp.delay(400).springify()} style={[styles.podiumItem, styles.podiumItemSide]}>
                   <Avatar name={topPlayers[2].name} size={80} />
                   <View style={styles.podiumBadge}>
                     <Text style={styles.podiumBadgeText}>3</Text>
                   </View>
                   <Text style={styles.podiumName}>{topPlayers[2].name}</Text>
                   <Text style={styles.podiumScore}>{topPlayers[2].score}</Text>
-                </View>
+                </Animated.View>
               </View>
             )}
 
             <View style={styles.listContainer}>
-              {listPlayers.map((player) => (
-                <TouchableOpacity key={player.rank} style={styles.listItem}>
-                  <View style={styles.listItemLeft}>
-                    <Text style={styles.listItemRank}>{player.rank}</Text>
-                    <Avatar name={player.name} size={40} />
-                    <Text style={styles.listItemName}>{player.name}</Text>
-                  </View>
-                  <Text style={styles.listItemScore}>{player.score}</Text>
-                </TouchableOpacity>
+              {listPlayers.map((player, index) => (
+                <Animated.View key={player.rank} entering={FadeInDown.delay(600 + index * 100).springify()}>
+                  <TouchableOpacity style={styles.listItem}>
+                    <View style={styles.listItemLeft}>
+                      <Text style={styles.listItemRank}>{player.rank}</Text>
+                      <Avatar name={player.name} size={40} />
+                      <Text style={styles.listItemName}>{player.name}</Text>
+                    </View>
+                    <Text style={styles.listItemScore}>{player.score}</Text>
+                  </TouchableOpacity>
+                </Animated.View>
               ))}
             </View>
 
@@ -122,20 +128,7 @@ const RankingScreen: React.FC = () => {
         )}
       </ScrollView>
 
-      <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/dashboard')}>
-          <LayoutDashboard size={20} color="#a1a1aa" strokeWidth={1.5} />
-          <Text style={styles.navLabel}>DASHBOARD</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.navItem, styles.navItemActive]} onPress={() => router.push('/ranking')}>
-          <Trophy size={20} color="#000000" strokeWidth={1.5} />
-          <Text style={styles.navLabelActive}>RANKING</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/settings')}>
-          <User size={20} color="#a1a1aa" strokeWidth={1.5} />
-          <Text style={styles.navLabel}>PERFIL</Text>
-        </TouchableOpacity>
-      </View>
+      <BottomNavigationBar activeRoute="/ranking" />
     </SafeAreaView>
   );
 };
@@ -332,48 +325,6 @@ const styles = StyleSheet.create({
     color: theme.colors.onSurface,
     textTransform: 'uppercase',
     letterSpacing: 1,
-  },
-  bottomNav: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 80,
-    backgroundColor: '#ffffff',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: '#18181b',
-    paddingHorizontal: 16,
-  },
-  navItem: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100%',
-    paddingTop: 8,
-    borderTopWidth: 2,
-    borderTopColor: 'transparent',
-  },
-  navItemActive: {
-    borderTopColor: '#09090b',
-  },
-  navLabel: {
-    fontFamily: 'Inter',
-    fontSize: 10,
-    textTransform: 'uppercase',
-    letterSpacing: -0.5,
-    marginTop: 4,
-    color: '#a1a1aa',
-  },
-  navLabelActive: {
-    fontFamily: 'Inter',
-    fontSize: 10,
-    textTransform: 'uppercase',
-    letterSpacing: -0.5,
-    marginTop: 4,
-    color: '#09090b',
   },
 });
 

@@ -1,9 +1,33 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Bell, User, Trophy, Crown, LayoutDashboard } from 'lucide-react-native';
+import { User, Trophy, Crown } from 'lucide-react-native';
 import theme from '../theme';
 import { useAuth } from '../context/AuthContext';
+import { BottomNavigationBar } from '../components/BottomNavigationBar';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring, FadeInDown } from 'react-native-reanimated';
+
+const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+
+function ActionCard({ style, onPress, delay, children }: any) {
+  const scale = useSharedValue(1);
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }]
+  }));
+
+  return (
+    <AnimatedTouchable
+      entering={FadeInDown.delay(delay).springify()}
+      style={[style, animatedStyle]}
+      activeOpacity={0.8}
+      onPressIn={() => { scale.value = withSpring(0.96); }}
+      onPressOut={() => { scale.value = withSpring(1); }}
+      onPress={onPress}
+    >
+      {children}
+    </AnimatedTouchable>
+  );
+}
 
 const DashboardScreen: React.FC = () => {
   const router = useRouter();
@@ -20,9 +44,6 @@ const DashboardScreen: React.FC = () => {
           />
           <Text style={styles.userName}>{user?.name?.toUpperCase() ?? ''}</Text>
         </View>
-        <TouchableOpacity style={styles.notificationBtn}>
-          <Bell size={24} color={theme.colors.onSurface} strokeWidth={1.5} />
-        </TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -35,7 +56,7 @@ const DashboardScreen: React.FC = () => {
         {/* Minimalist Bento Grid */}
         <View style={styles.grid}>
           {/* Card 1 - Full Width */}
-          <TouchableOpacity style={[styles.card, styles.cardFull]} onPress={() => router.push('/settings')}>
+          <ActionCard style={[styles.card, styles.cardFull]} delay={0} onPress={() => router.push('/settings')}>
             <View style={styles.cardIconBox}>
               <User size={24} color={theme.colors.onSurface} strokeWidth={1.5} />
             </View>
@@ -43,10 +64,10 @@ const DashboardScreen: React.FC = () => {
               <Text style={styles.cardTitle}>Configurações{'\n'}do Perfil</Text>
               <View style={styles.cardHoverLine} />
             </View>
-          </TouchableOpacity>
+          </ActionCard>
 
           {/* Card 3 */}
-          <TouchableOpacity style={styles.card} onPress={() => router.push('/ranking')}>
+          <ActionCard style={styles.card} delay={100} onPress={() => router.push('/ranking')}>
             <View style={styles.cardIconBox}>
               <Trophy size={24} color={theme.colors.onSurface} strokeWidth={1.5} />
             </View>
@@ -54,34 +75,18 @@ const DashboardScreen: React.FC = () => {
               <Text style={styles.cardTitle}>Classificação</Text>
               <View style={styles.cardHoverLine} />
             </View>
-          </TouchableOpacity>
+          </ActionCard>
 
-          {/* Card 4 - Decorative */}
-          <View style={[styles.card, styles.cardDecorative]}>
+          {/* Card 4 - Play Chess */}
+          <ActionCard style={[styles.card, styles.cardDecorative]} delay={200} onPress={() => router.push('/chess')}>
             <View style={styles.decorativeIconBox}>
               <Crown size={40} color={theme.colors.surfaceContainerLowest} strokeWidth={1.5} />
             </View>
-          </View>
+          </ActionCard>
         </View>
       </ScrollView>
 
-      {/* BottomNavBar */}
-      <View style={styles.bottomNav}>
-        <TouchableOpacity style={[styles.navItem, styles.navItemActive]} onPress={() => router.push('/dashboard')}>
-          <LayoutDashboard size={20} color="#09090b" strokeWidth={1.5} />
-          <Text style={styles.navLabelActive}>DASHBOARD</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/ranking')}>
-          <Trophy size={20} color="#a1a1aa" strokeWidth={1.5} />
-          <Text style={styles.navLabel}>RANKING</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.navItem} onPress={() => router.push('/settings')}>
-          <User size={20} color="#a1a1aa" strokeWidth={1.5} />
-          <Text style={styles.navLabel}>PERFIL</Text>
-        </TouchableOpacity>
-      </View>
+      <BottomNavigationBar activeRoute="/dashboard" />
     </SafeAreaView>
   );
 };
@@ -120,9 +125,6 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 1,
     color: '#18181b',
-  },
-  notificationBtn: {
-    padding: 8,
   },
   scrollContent: {
     paddingTop: 32,
@@ -216,56 +218,6 @@ const styles = StyleSheet.create({
   decorativeIcon: {
     fontSize: 40,
     color: theme.colors.surfaceContainerLowest,
-  },
-  bottomNav: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 80,
-    backgroundColor: '#ffffff',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: '#18181b',
-    paddingHorizontal: 16,
-  },
-  navItem: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100%',
-    paddingTop: 8,
-    borderTopWidth: 2,
-    borderTopColor: 'transparent',
-  },
-  navItemActive: {
-    borderTopColor: '#09090b',
-  },
-  navIcon: {
-    fontSize: 20,
-    color: '#a1a1aa',
-  },
-  navIconActive: {
-    fontSize: 20,
-    color: '#09090b',
-  },
-  navLabel: {
-    fontFamily: 'Inter',
-    fontSize: 10,
-    textTransform: 'uppercase',
-    letterSpacing: -0.5,
-    marginTop: 4,
-    color: '#a1a1aa',
-  },
-  navLabelActive: {
-    fontFamily: 'Inter',
-    fontSize: 10,
-    textTransform: 'uppercase',
-    letterSpacing: -0.5,
-    marginTop: 4,
-    color: '#09090b',
   },
 });
 

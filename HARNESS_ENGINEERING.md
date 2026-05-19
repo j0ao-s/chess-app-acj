@@ -160,9 +160,80 @@ Tokens: 0
 
 ---
 
+## 🐛 METODOLOGIA: Bug Reporting com Economia de Tokens
+
+**Objetivo:** Atacar bugs de forma estruturada, minimizando contexto desnecessário.
+
+### 📋 Template de Bug Report
+
+```
+## BUG-ID: [Nome Descritivo]
+
+**Severidade:** 🔴 Critical | 🟠 High | 🟡 Medium | 🟢 Low
+
+### Sintoma (1 linha)
+[Descrição breve do comportamento errado]
+
+### Passos para Reproduzir
+1. [Ação 1]
+2. [Ação 2]
+3. [Ação 3]
+
+### Resultado Esperado
+[O que deveria acontecer]
+
+### Resultado Atual
+[O que realmente acontece]
+
+### Stack Trace / Console Error
+[Se houver, copie aqui ou deixe em branco]
+
+### Arquivo(s) Afetado(s)
+- core/screens/ChessGameScreen.tsx
+- core/hooks/useChessGame.ts
+
+### Root Cause (após investigação)
+[Causa identificada em uma linha - ex: "TouchableOpacity com disabled=true bloqueia onPress"]
+
+### Fix Implementado
+[Resumo da solução em 1-2 linhas]
+```
+
+### ⚡ Prompt Otimizado para Claude (Economia máxima)
+
+```
+Ferramenta: Claude Code
+
+Prompt curto e direto:
+"BUG-ID: [Nome]. Arquivo: [path:linhas]. 
+Problema: [descrição de 1 linha].
+Passos: [3-5 passos numerados].
+Resultado: [esperado] vs [atual].
+Causa suspeita: [sua hipótese ou deixar vazio].
+Pedir: [Confirmar causa + implementar fix]"
+
+Economia:
+- ✅ Cite linhas já lidas (não releia arquivo todo)
+- ✅ Inclua apenas arquivo afetado (não contexto inteiro)
+- ✅ Sua hipótese reduz busca do Claude (save 200-400 tokens)
+- ✅ Peça fix + teste em 1 prompt (não separados)
+
+Exemplo bom:
+"BUG-ID: Buttons-Not-Working. 
+Arquivo: core/screens/ChessGameScreen.tsx:119-144.
+Problema: Botões 'Novo Jogo', 'Desistir', 'Voltar' não respondem ao toque.
+Passos: 1. Jogar xadrez. 2. Clicar 'Novo Jogo'. 3. Nada acontece.
+Causa suspeita: TouchableOpacity tem disabled={true} bloqueando o onPress.
+Pedir: Confirmar + remover disabled e permitir clique."
+
+Economia: ~200 tokens vs ~800 (contexto completo)"
+```
+
+---
+
 ## ✅ TAREFA 4: Implementar Jogo de Xadrez (Stockfish)
 
-**Status:** 🟠 **COMPLEXO**  
+**Status:** 🟠 **EM PROGRESSO - BUGS ENCONTRADOS**  
 **Impacto:** Feature core do app
 
 ### 📌 Requirements
@@ -216,9 +287,92 @@ Arquivo: core/screens/ChessGameScreen.tsx
 Tokens: ~1800
 ```
 
-**Tokens Claude Total:** ~4300  
-**Tempo:** 4-6 horas  
-**Prioridade:** 🟠 ALTA (feature core)
+### 🐛 BUG REPORTS - TAREFA 4
+
+#### **BUG-001: Botões Não Funcionam (Novo Jogo, Desistir, Voltar)**
+
+**Severidade:** 🟠 HIGH  
+**Status:** 🔄 EM INVESTIGAÇÃO
+
+**Sintoma:** Clicar em botões da ChessGameScreen não dispara ações (nenhum Alert, nenhuma mudança de estado)
+
+**Passos para Reproduzir:**
+1. Jogar alguns movimentos no xadrez
+2. Clicar botão "Novo Jogo"
+3. Nada acontece (sem Alert)
+4. Repetir com "Desistir" e "Voltar"
+
+**Resultado Esperado:**
+- "Novo Jogo" → Alert de confirmação
+- "Desistir" → Alert de desistência
+- "Voltar" → Alert se jogo em progresso, senão volta ao dashboard
+
+**Resultado Atual:**
+- Cliques não disparam nada
+- Handlers aparentemente não executam
+
+**Arquivo(s) Afetado(s):**
+- core/screens/ChessGameScreen.tsx (linhas 40-77, 119-144)
+- core/hooks/useChessGame.ts (funções initGame, resign, undoMove)
+
+**Root Cause Suspeitado:**
+- Possível: Handlers não estão sendo bind corretamente
+- Possível: ScrollView/View overlay está bloqueando toque
+- Possível: Estado não atualiza e os handlers recebem estado desatualizado
+
+**Solução a Testar:**
+- [ ] Verificar se `onPress` está sendo acionado (add console.log)
+- [ ] Remover scroll/overlay da ScrollView
+- [ ] Testar se handlers conseguem chamar setState
+- [ ] Verificar se há erro silencioso no catch
+
+---
+
+#### **BUG-002: Bottom Navigation Não Replicado em Novas Telas**
+
+**Severidade:** 🟡 MEDIUM  
+**Status:** 🔄 EM DESIGN
+
+**Sintoma:** ChessGameScreen tem bottom nav custom (Jogo, Ranking, Config), mas outras telas novas (futuras) não seguem padrão
+
+**Passos para Reproduzir:**
+1. Abrir ChessGameScreen → tem bottom nav com 3 tabs
+2. Ir para SettingsScreen → bottom nav desaparece
+3. Voltar ao Dashboard → layout diferente da ChessGameScreen
+
+**Resultado Esperado:**
+- Todos os screens deveriam replicar o bottom nav padrão
+- Bottom nav com: Jogo | Ranking | Config (mesmo em todas as telas)
+- Design consistente conforme theme.js
+
+**Resultado Atual:**
+- Apenas ChessGameScreen tem bottom nav hardcoded
+- Outras telas não têm componente reutilizável
+- Risco de inconsistência em futuras telas
+
+**Arquivo(s) Afetado(s):**
+- core/screens/ChessGameScreen.tsx (linhas 147-169: hardcoded nav)
+- core/screens/SettingsScreen.tsx (sem bottom nav)
+- core/screens/RankingScreen.tsx (sem bottom nav)
+- core/screens/DashboardScreen.tsx (sem bottom nav)
+
+**Root Cause:**
+- Bottom nav foi built-in no ChessGameScreen, não extraído como componente reutilizável
+- Falta componente central: `BottomNavigationBar.tsx` ou layout wrapper
+
+**Solução Recomendada:**
+1. Extrair bottom nav para novo componente: `core/components/BottomNavigationBar.tsx`
+2. Aceitar props: `activeTab: 'game' | 'ranking' | 'settings'`
+3. Aplicar em TODAS as screens que devem ter nav
+4. Usar theme.js para estilo (já definido em ChessGameScreen)
+
+**Tokens Estimados:** ~1000 (extract + aplica em 4 screens)
+
+---
+
+**Tokens Claude Total:** ~4300 (original) + ~800 (bugs) = **~5100**  
+**Tempo:** 4-6 horas + 1-2 horas de bugs = **5-8 horas**  
+**Prioridade:** 🔴 BLOCKER (bugs impedem testes completos)
 
 ---
 
