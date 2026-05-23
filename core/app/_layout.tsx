@@ -11,7 +11,7 @@ function RouteGuard() {
 
   useEffect(() => {
     if (loading) return
-    const isProtected = ['dashboard', 'ranking', 'settings', 'chess'].includes(segments[0] as string)
+    const isProtected = ['dashboard', 'ranking', 'settings', 'chess', 'credits'].includes(segments[0] as string)
     if (!user && isProtected) {
       router.replace('/')
     } else if (user && !isProtected) {
@@ -33,6 +33,7 @@ export default function RootLayout() {
         <Stack.Screen name="ranking" />
         <Stack.Screen name="settings" />
         <Stack.Screen name="chess" />
+        <Stack.Screen name="credits" />
       </Stack>
       <StatusBar style="auto" />
     </AuthProvider>

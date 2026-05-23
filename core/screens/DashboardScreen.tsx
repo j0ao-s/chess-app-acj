@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { User, Trophy, Crown } from 'lucide-react-native';
+import { User, Trophy, Crown, Award } from 'lucide-react-native';
 import theme from '../theme';
 import { useAuth } from '../context/AuthContext';
 import { BottomNavigationBar } from '../components/BottomNavigationBar';
@@ -81,6 +81,17 @@ const DashboardScreen: React.FC = () => {
           <ActionCard style={[styles.card, styles.cardDecorative]} delay={200} onPress={() => router.push('/chess')}>
             <View style={styles.decorativeIconBox}>
               <Crown size={40} color={theme.colors.surfaceContainerLowest} strokeWidth={1.5} />
+            </View>
+          </ActionCard>
+
+          {/* Card 5 - Credits */}
+          <ActionCard style={styles.card} delay={300} onPress={() => router.push('/credits')}>
+            <View style={styles.cardIconBox}>
+              <Award size={24} color={theme.colors.onSurface} strokeWidth={1.5} />
+            </View>
+            <View>
+              <Text style={styles.cardTitle}>Créditos</Text>
+              <View style={styles.cardHoverLine} />
             </View>
           </ActionCard>
         </View>
